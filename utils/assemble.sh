@@ -7,10 +7,11 @@
 # 
 
 # Last modification date
-LAST_MOD_DATE="2024-03-15"
+LAST_MOD_DATE="2024-11-15"
 
 #setup some folders
-repo_dir=$(dirname ${0:A})
+util_dir=$(dirname ${0:A})
+repo_dir="$util_dir/.."
 build_dir="$repo_dir/build"
 destination_file="$build_dir/uninstaller.sh"
 fragments_dir="$repo_dir/fragments"
@@ -20,6 +21,26 @@ labels_dir="$fragments_dir/labels"
 label_paths+=$labels_dir
 
 #echo "label_paths: $label_paths"
+
+
+zparseopts -D -E -a opts r -run s -script h -help -labels+:=label_args l+:=label_args
+
+if (( ${opts[(I)(-h|--help)]} )); then
+    echo "usage: assemble.sh [--script]"
+    echo
+    echo "Builds and runs the uninstaller script from the fragments."
+    echo 
+    echo "When --script is used the uninstaller script in the root of the project will be replaced. And labels.txt will be updated."
+    echo "Otherwise the uninstaller script will be built in the /built directory."
+    exit
+fi
+
+# Default Settings
+runScript=1
+
+if (( ${opts[(I)(-s|--script)]} )); then
+    buildScript=1
+fi
 
 fragment_files=( header.sh version.sh functions.sh arguments.sh main.sh )
 
